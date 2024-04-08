@@ -36,7 +36,7 @@
         <tbody>
         <?php
         // Database connection
-        $connectionString = getenv('MYSQL_CONN_STRING');
+        $connectionString = getenv('MYSQL_CONN');
         $matches = [];
         preg_match('/mysql:host=(.+);dbname=(.+);user=(.+);password=(.+)/', $connectionString, $matches);
         $host = $matches[1] ?? null;
