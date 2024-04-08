@@ -16,7 +16,7 @@ if (!$conn) {
 }
 
 // Specify MySQL connection needs to use SSL
-mysqli_ssl_set($conn,NULL,NULL, '/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
+mysqli_ssl_set($conn,NULL,NULL, '/home/site/wwwroot/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
 
 // Attempt to establish the secure database connection
 if (!mysqli_real_connect($conn, $host, $username, $password, $dbname, 3306, NULL, MYSQLI_CLIENT_SSL)) {
