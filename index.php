@@ -24,12 +24,20 @@ if (!mysqli_real_connect($conn, $host, $username, $password, $dbname, 3306, NULL
 }
 
 // Check if adding a new task
-if(isset($_POST['add']) && $_POST['task'] != "") {
+if(isset($_POST['add']) && !empty($_POST['task'])) {
     $task = $_POST['task'];
-    $conn->query("INSERT INTO `task` (task, status) VALUES ('$task', '')");
+    $status = ''; // Assuming a default status value
+
+    // Prepare the statement to prevent SQL injection
+    $stmt = $conn->prepare("INSERT INTO tasks (task, status) VALUES (?, ?)");
+    $stmt->bind_param("ss", $task, $status); // "ss" denotes two strings
+    $stmt->execute();
+
+    // Redirect to avoid form resubmission
     header('Location: index.php');
     exit;
 }
+
 
 // Check if deleting a task
 if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['task_id'])) {
