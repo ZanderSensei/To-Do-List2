@@ -16,41 +16,34 @@ if (!$conn) {
 }
 
 // Specify MySQL connection needs to use SSL
-mysqli_ssl_set($conn,NULL,NULL, '/home/site/wwwroot/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
+mysqli_ssl_set($conn, NULL, NULL, '/home/site/wwwroot/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
 
 // Attempt to establish the secure database connection
 if (!mysqli_real_connect($conn, $host, $username, $password, $dbname, 3306, NULL, MYSQLI_CLIENT_SSL)) {
     die('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
 }
 
-// Check if adding a new task
+// Actions
 if(isset($_POST['add']) && !empty($_POST['task'])) {
     $task = $_POST['task'];
-    $status = ''; // Assuming a default status value
-
-    // Prepare the statement to prevent SQL injection
+    $status = 'Pending'; // Default status
     $stmt = $conn->prepare("INSERT INTO tasks (task, status) VALUES (?, ?)");
-    $stmt->bind_param("ss", $task, $status); // "ss" denotes two strings
+    $stmt->bind_param("ss", $task, $status);
     $stmt->execute();
-
-    // Redirect to avoid form resubmission
     header('Location: index.php');
     exit;
 }
 
-
-// Check if deleting a task
 if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['task_id'])) {
     $task_id = $_GET['task_id'];
-    $conn->query("DELETE FROM `task` WHERE `task_id` = $task_id");
+    $conn->query("DELETE FROM tasks WHERE `task_id` = $task_id");
     header('Location: index.php');
     exit;
 }
 
-// Check if updating a task status
 if(isset($_GET['action']) && $_GET['action'] == 'update' && isset($_GET['task_id'])) {
     $task_id = $_GET['task_id'];
-    $conn->query("UPDATE `task` SET `status` = 'Done' WHERE `task_id` = $task_id");
+    $conn->query("UPDATE tasks SET `status` = 'Done' WHERE `task_id` = $task_id");
     header('Location: index.php');
     exit;
 }
@@ -77,7 +70,6 @@ echo "Connected successfully to the database using SSL.";
     <div class="col-md-2"></div>
     <div class="col-md-8">
         <center>
-            <!-- Updated form action to point to the same index.php file -->
             <form method="POST" class="form-inline">
                 <input type="text" class="form-control" name="task" required/>
                 <button type="submit" class="btn btn-primary form-control" name="add">Add Task</button>
@@ -96,8 +88,7 @@ echo "Connected successfully to the database using SSL.";
         </thead>
         <tbody>
         <?php
-        // Assuming $conn is your MySQLi connection variable
-        $query = $conn->query("SELECT * FROM `task` ORDER BY `task_id` ASC");
+        $query = $conn->query("SELECT * FROM tasks ORDER BY `task_id` ASC");
         $count = 1;
         while ($fetch = $query->fetch_assoc()) {
             echo "<tr>";
@@ -105,7 +96,6 @@ echo "Connected successfully to the database using SSL.";
             echo "<td>" . htmlspecialchars($fetch['task']) . "</td>";
             echo "<td>" . htmlspecialchars($fetch['status']) . "</td>";
             echo "<td colspan='2'><center>";
-            // Updated links to include action in the query string for delete/update
             echo '<a href="?action=update&task_id=' . $fetch['task_id'] . '" class="btn btn-success">Mark as Done</a> | ';
             echo '<a href="?action=delete&task_id=' . $fetch['task_id'] . '" class="btn btn-danger">Delete</a>';
             echo "</center></td>";
