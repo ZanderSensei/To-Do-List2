@@ -35,19 +35,20 @@
         </thead>
         <tbody>
         <?php
-        // Database connection
-        $connectionString = getenv('MYSQL_CONN');
-        $matches = [];
-        preg_match('/mysql:host=(.+);dbname=(.+);user=(.+);password=(.+)/', $connectionString, $matches);
-        $host = $matches[1] ?? null;
-        $dbname = $matches[2] ?? null;
-        $username = $matches[3] ?? null;
-        $password = $matches[4] ?? null;
+        // Environment variables for database connection
+        $host = getenv('DB_HOST');
+        $dbname = getenv('DB_NAME');
+        $username = getenv('DB_USER');
+        $password = getenv('DB_PASS');
+
+        // Establish the database connection
         $conn = new mysqli($host, $username, $password, $dbname);
+        
+        // Check the connection
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
-
+        
         // Query execution
         $query = $conn->query("SELECT * FROM `task` ORDER BY `task_id` ASC");
         $count = 1;
