@@ -16,10 +16,10 @@ if (!$conn) {
 }
 
 // Specify MySQL connection needs to use SSL
-mysqli_ssl_set($conn,NULL,NULL, '/path/to/ca-cert.pem', NULL, NULL);
+mysqli_ssl_set($conn,NULL,NULL, '/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
 
 // Attempt to establish the secure database connection
-if (!mysqli_real_connect($conn, $host, $username, $password, $dbname, 3306, NULL, MYSQLI_CLIENT_SSL)) {
+if (!mysqli_real_connect($conn, $host, $username, $password, $dbname, 3307, NULL, MYSQLI_CLIENT_SSL)) {
     die('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
 }
 
