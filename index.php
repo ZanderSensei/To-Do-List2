@@ -9,16 +9,21 @@ $dbname = getenv('DB_NAME');
 $username = getenv('DB_USER');
 $password = getenv('DB_PASS');
 
-// Establish the database connection
-$conn = new mysqli($host, $username, $password, $dbname);
-
-// Check the connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Initialize MySQLi object
+$conn = mysqli_init();
+if (!$conn) {
+    die('mysqli_init failed');
 }
-echo "Connected successfully to the database.";
 
-// Proceed with your application logic
+// Specify MySQL connection needs to use SSL
+mysqli_ssl_set($conn,NULL,NULL, '/path/to/ca-cert.pem', NULL, NULL);
+
+// Attempt to establish the secure database connection
+if (!mysqli_real_connect($conn, $host, $username, $password, $dbname, 3306, NULL, MYSQLI_CLIENT_SSL)) {
+    die('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+}
+
+echo "Connected successfully to the database using SSL.";
 ?>
 
 <!DOCTYPE html>
