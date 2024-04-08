@@ -1,3 +1,26 @@
+<?php
+// Enable error reporting for debugging (remove or modify in production)
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// Environment variables for database connection
+$host = getenv('DB_HOST') ?: 'localhost'; // Using 'localhost' as a fallback
+$dbname = getenv('DB_NAME');
+$username = getenv('DB_USER');
+$password = getenv('DB_PASS');
+
+// Establish the database connection
+$conn = new mysqli($host, $username, $password, $dbname);
+
+// Check the connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+echo "Connected successfully to the database.";
+
+// Proceed with your application logic
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,33 +58,19 @@
         </thead>
         <tbody>
         <?php
-        // Environment variables for database connection
-        $host = getenv('DB_HOST');
-        $dbname = getenv('DB_NAME');
-        $username = getenv('DB_USER');
-        $password = getenv('DB_PASS');
-
-        // Establish the database connection
-        $conn = new mysqli($host, $username, $password, $dbname);
-        
-        // Check the connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-        
-        // Query execution
+        // Example database query (modify as needed)
         $query = $conn->query("SELECT * FROM `task` ORDER BY `task_id` ASC");
         $count = 1;
-        while($fetch = $query->fetch_array()){
+        while ($fetch = $query->fetch_assoc()) {
             echo "<tr>";
             echo "<td>" . $count++ . "</td>";
-            echo "<td>" . $fetch['task'] . "</td>";
-            echo "<td>" . $fetch['status'] . "</td>";
+            echo "<td>" . htmlspecialchars($fetch['task']) . "</td>";
+            echo "<td>" . htmlspecialchars($fetch['status']) . "</td>";
             echo "<td colspan='2'><center>";
-            if($fetch['status'] != "Done"){
-                echo '<a href="update_task.php?task_id='.$fetch['task_id'].'" class="btn btn-success"><span class="glyphicon glyphicon-check"></span></a> |';
+            if ($fetch['status'] != "Done") {
+                echo '<a href="update_task.php?task_id=' . $fetch['task_id'] . '" class="btn btn-success"><span class="glyphicon glyphicon-check"></span></a> |';
             }
-            echo '<a href="delete_query.php?task_id='.$fetch['task_id'].'" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></a>';
+            echo '<a href="delete_query.php?task_id=' . $fetch['task_id'] . '" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></a>';
             echo "</center></td>";
             echo "</tr>";
         }
