@@ -23,6 +23,30 @@ if (!mysqli_real_connect($conn, $host, $username, $password, $dbname, 3306, NULL
     die('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
 }
 
+// Check if adding a new task
+if(isset($_POST['add']) && $_POST['task'] != "") {
+    $task = $_POST['task'];
+    $conn->query("INSERT INTO `task` (task, status) VALUES ('$task', '')");
+    header('Location: index.php');
+    exit;
+}
+
+// Check if deleting a task
+if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['task_id'])) {
+    $task_id = $_GET['task_id'];
+    $conn->query("DELETE FROM `task` WHERE `task_id` = $task_id");
+    header('Location: index.php');
+    exit;
+}
+
+// Check if updating a task status
+if(isset($_GET['action']) && $_GET['action'] == 'update' && isset($_GET['task_id'])) {
+    $task_id = $_GET['task_id'];
+    $conn->query("UPDATE `task` SET `status` = 'Done' WHERE `task_id` = $task_id");
+    header('Location: index.php');
+    exit;
+}
+
 echo "Connected successfully to the database using SSL.";
 ?>
 
@@ -45,9 +69,10 @@ echo "Connected successfully to the database using SSL.";
     <div class="col-md-2"></div>
     <div class="col-md-8">
         <center>
-            <form method="POST" class="form-inline" action="add_query.php">
+            <!-- Updated form action to point to the same index.php file -->
+            <form method="POST" class="form-inline">
                 <input type="text" class="form-control" name="task" required/>
-                <button class="btn btn-primary form-control" name="add">Add Task</button>
+                <button type="submit" class="btn btn-primary form-control" name="add">Add Task</button>
             </form>
         </center>
     </div>
@@ -63,7 +88,7 @@ echo "Connected successfully to the database using SSL.";
         </thead>
         <tbody>
         <?php
-        // Example database query (modify as needed)
+        // Assuming $conn is your MySQLi connection variable
         $query = $conn->query("SELECT * FROM `task` ORDER BY `task_id` ASC");
         $count = 1;
         while ($fetch = $query->fetch_assoc()) {
@@ -72,10 +97,9 @@ echo "Connected successfully to the database using SSL.";
             echo "<td>" . htmlspecialchars($fetch['task']) . "</td>";
             echo "<td>" . htmlspecialchars($fetch['status']) . "</td>";
             echo "<td colspan='2'><center>";
-            if ($fetch['status'] != "Done") {
-                echo '<a href="update_task.php?task_id=' . $fetch['task_id'] . '" class="btn btn-success"><span class="glyphicon glyphicon-check"></span></a> |';
-            }
-            echo '<a href="delete_query.php?task_id=' . $fetch['task_id'] . '" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></a>';
+            // Updated links to include action in the query string for delete/update
+            echo '<a href="?action=update&task_id=' . $fetch['task_id'] . '" class="btn btn-success">Mark as Done</a> | ';
+            echo '<a href="?action=delete&task_id=' . $fetch['task_id'] . '" class="btn btn-danger">Delete</a>';
             echo "</center></td>";
             echo "</tr>";
         }
